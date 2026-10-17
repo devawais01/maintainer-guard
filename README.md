@@ -75,7 +75,7 @@ jobs:
   triage:
     runs-on: ubuntu-latest
     steps:
-      - uses: YOUR_USERNAME/maintainer-guard@main
+      - uses: devawais01/maintainer-guard@main
         with:
           gemini_api_key: ${{ secrets.GEMINI_API_KEY }}
 ```
