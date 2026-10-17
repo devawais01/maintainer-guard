@@ -5,7 +5,7 @@ and let obvious cases be explained clearly in the comment.
 """
 import re
 
-DOC_EXT = (".md", ".rst", ".txt", ".adoc")
+DOC_EXT = (".md", ".mdx", ".markdown", ".rst", ".txt", ".adoc")
 NAME_LIST_FILES = re.compile(r"(contributors|authors|thanks|people|members)", re.I)
 
 
@@ -31,7 +31,10 @@ def pr_signals(files, title="", body=""):
         whitespace_only = False
 
     text = f"{title}\n{body}".lower()
-    hacktober_bait = any(k in text for k in ("hacktoberfest", "please merge", "accept my pr", "for hacktober"))
+    hacktober_bait = any(k in text for k in (
+           "hacktoberfest", "please merge", "accept my pr", "for hacktober",
+           "merge my pr", "plz merge", "kindly merge", "add hacktoberfest-accepted",
+       ))
 
     flags = []
     if total_add + total_del <= 3:
