@@ -1,0 +1,55 @@
+name: "Maintainer Guard"
+description: "Gemma 4-powered triage for Hacktoberfest: labels spam PRs and turns screenshot bug reports into structured issues."
+author: "Maintainer Guard contributors"
+branding:
+  icon: "shield"
+  color: "green"
+
+inputs:
+  gemini_api_key:
+    description: "Gemini API key (used to call the open-weights Gemma 4 model)"
+    required: true
+  github_token:
+    description: "Token used to label and comment"
+    required: false
+    default: ${{ github.token }}
+  model:
+    description: "Gemma 4 model id"
+    required: false
+    default: "gemma-4-26b-a4b-it"
+  close_spam:
+    description: "Automatically close PRs judged as spam with high confidence"
+    required: false
+    default: "false"
+  close_threshold:
+    description: "Minimum confidence (0-1) needed to auto-close spam"
+    required: false
+    default: "0.9"
+  include_maintainers:
+    description: "Also triage PRs from owners/members/collaborators"
+    required: false
+    default: "false"
+  dry_run:
+    description: "Log decisions without labeling, commenting or closing"
+    required: false
+    default: "false"
+
+runs:
+  using: "composite"
+  steps:
+    - uses: actions/setup-python@v5
+      with:
+        python-version: "3.12"
+    - shell: bash
+      run: pip install -q -r "${{ github.action_path }}/requirements.txt"
+    - shell: bash
+      working-directory: ${{ github.action_path }}
+      env:
+        GEMINI_API_KEY: ${{ inputs.gemini_api_key }}
+        GITHUB_TOKEN: ${{ inputs.github_token }}
+        GUARD_MODEL: ${{ inputs.model }}
+        GUARD_CLOSE_SPAM: ${{ inputs.close_spam }}
+        GUARD_CLOSE_THRESHOLD: ${{ inputs.close_threshold }}
+        GUARD_INCLUDE_MAINTAINERS: ${{ inputs.include_maintainers }}
+        GUARD_DRY_RUN: ${{ inputs.dry_run }}
+      run: python -m guard.main

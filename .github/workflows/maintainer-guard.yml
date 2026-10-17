@@ -1,0 +1,22 @@
+name: Maintainer Guard
+
+on:
+  pull_request_target:          # runs with the base repo's secrets, but we never check out PR code
+    types: [opened, edited, synchronize, reopened]
+  issues:
+    types: [opened, edited]
+
+permissions:
+  contents: read
+  issues: write
+  pull-requests: write
+
+jobs:
+  triage:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4   # checks out THIS repo's default branch (the action itself), not the PR
+      - uses: ./
+        with:
+          gemini_api_key: ${{ secrets.GEMINI_API_KEY }}
+          include_maintainers: "true"   # so you can demo it on your own repo

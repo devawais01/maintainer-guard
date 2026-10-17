@@ -1,0 +1,26 @@
+diff --git a/weather/api.py b/weather/api.py
+index 4c1d2e3..9f8e7d6 100644
+--- a/weather/api.py
++++ b/weather/api.py
+@@ -18,9 +18,13 @@ def get_temperature(city):
+     resp = requests.get(URL, params={"q": city, "appid": API_KEY}, timeout=10)
+-    data = resp.json()
+-    return data["main"]["temp"] - 273
++    resp.raise_for_status()
++    data = resp.json()
++    # API returns Kelvin; 0 °C is 273.15 K, not 273
++    return round(data["main"]["temp"] - 273.15, 1)
+diff --git a/tests/test_api.py b/tests/test_api.py
+index 0000000..1111111 100644
+--- a/tests/test_api.py
++++ b/tests/test_api.py
+@@ -0,0 +1,9 @@
++from unittest.mock import patch
++from weather.api import get_temperature
++
++def test_kelvin_conversion():
++    fake = {"main": {"temp": 300.15}}
++    with patch("weather.api.requests.get") as g:
++        g.return_value.json.return_value = fake
++        g.return_value.raise_for_status.return_value = None
++        assert get_temperature("Lahore") == 27.0
